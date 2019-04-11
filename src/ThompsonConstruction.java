@@ -4,8 +4,6 @@ public class ThompsonConstruction {
     private int index;
     private String regex;
     private Graph NDFA;
-    private Node initial;
-    private Node finish;
 
 
     public ThompsonConstruction(String regex)
@@ -14,8 +12,6 @@ public class ThompsonConstruction {
         this.regex = preProcess(regex);
         System.out.println(this.regex);
         NDFA = new Graph("NDFA");
-        initial = null;
-        finish = null;
     }
 
     public static Graph regexToNDFA(String regex)
@@ -148,37 +144,37 @@ public class ThompsonConstruction {
         initial.addConnection(finish, String.valueOf(expr.getSymb()));
 
         //update states
-        this.initial = initial;
-        this.finish = finish;
+        NDFA.setInitial(initial);
+        NDFA.setFinish(finish);
     }
 
     private void concExp(Expression.And expr)
     {
         //Get initial nodes
         expressionToNDFA(expr.getLeft());
-        Node aI = initial;
-        Node aF = finish;
+        Node aI = NDFA.getInitial();
+        Node aF = NDFA.getFinish();
         expressionToNDFA(expr.getRight());
-        Node bI = initial;
-        Node bF = finish;
+        Node bI = NDFA.getInitial();
+        Node bF = NDFA.getFinish();
 
         //Perform Thompson's construction
         aF.addConnection(bI, null);
 
         //update states
-        this.initial = aI;
-        this.finish = bF;
+        NDFA.setInitial(aI);
+        NDFA.setFinish(bF);
     }
 
     private void unionExp(Expression.Or expr)
     {
         //Get initial nodes
         expressionToNDFA(expr.getLeft());
-        Node aI = initial;
-        Node aF = finish;
+        Node aI = NDFA.getInitial();
+        Node aF = NDFA.getFinish();
         expressionToNDFA(expr.getRight());
-        Node bI = initial;
-        Node bF = finish;
+        Node bI = NDFA.getInitial();
+        Node bF = NDFA.getFinish();
         Node initial = addNode();
         Node finish = addNode();
 
@@ -189,16 +185,16 @@ public class ThompsonConstruction {
         bF.addConnection(finish, null);
 
         //update states
-        this.initial = initial;
-        this.finish = finish;
+        NDFA.setInitial(initial);
+        NDFA.setFinish(finish);
     }
 
     private void kleenExp(Expression.Star expr)
     {
         //Get initial nodes
         expressionToNDFA(expr.getExpr());
-        Node aI = initial;
-        Node aF = finish;
+        Node aI = NDFA.getInitial();
+        Node aF = NDFA.getFinish();
         Node initial = addNode();
         Node finish = addNode();
 
@@ -208,8 +204,8 @@ public class ThompsonConstruction {
         aF.addConnection(aI, null);
         aF.addConnection(finish, null);
 
-        this.initial = initial;
-        this.finish = finish;
+        NDFA.setInitial(initial);
+        NDFA.setFinish(finish);
     }
 
     //endregion

@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Automatex {
@@ -12,6 +13,13 @@ public class Automatex {
 
             Graph NDFA = ThompsonConstruction.regexToNDFA(regex);
             NDFA.saveGraph();
+            try
+            {
+                Runtime.getRuntime().exec("dot " + NDFA.getName() + ".dot -Tpng -o " + NDFA.getName() + ".png");
+            }
+            catch (IOException e)
+            {
+            }
         }
     }
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class Graph {
     private String name;
     private ArrayList<Node> nodes;
+    private Node initial;
+    private Node finish;
 
     public Graph() {
         this("");
@@ -13,6 +15,8 @@ public class Graph {
     public Graph(String name) {
         this.name = name;
         nodes = new ArrayList<>();
+        initial = null;
+        finish = null;
     }
 
     public void saveGraph()
@@ -20,7 +24,7 @@ public class Graph {
         PrintWriter file = null;
         try
         {
-            file = new PrintWriter("Output.dot");
+            file = new PrintWriter(name + ".dot");
         }
         catch (FileNotFoundException e)
         {
@@ -29,6 +33,11 @@ public class Graph {
         }
 
         file.println("digraph " + name + " {");
+        file.println("rankdir=LR");
+        file.println("node [shape = point, color=white, fontcolor=white]; start");
+        file.println("node [shape = doublecircle, color=black, fontcolor=black]; " + finish.getName() + ";");
+        file.println("node [shape = circle];");
+        file.println("start -> " + initial.getName());
         for (Node node : nodes)
         {
             for (Edge edge : node.getConnections())
@@ -47,6 +56,23 @@ public class Graph {
     }
 
     //GETTER AND SETTER
+
+
+    public Node getInitial() {
+        return initial;
+    }
+
+    public void setInitial(Node initial) {
+        this.initial = initial;
+    }
+
+    public Node getFinish() {
+        return finish;
+    }
+
+    public void setFinish(Node finish) {
+        this.finish = finish;
+    }
 
     public void addNode(Node node)
     {
