@@ -9,7 +9,7 @@ public class Edge {
 
     public Edge(Node end, String weight) {
         this.end = end;
-        this.weight = (weight == null) ? "\" \"" : weight;
+        this.weight = weight;
     }
 
     //GETTER AND SETTER

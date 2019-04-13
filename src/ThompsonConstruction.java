@@ -20,6 +20,7 @@ public class ThompsonConstruction {
         Expression parsed =  parser.parse();
         System.out.println(parsed);
         parser.expressionToNDFA(parsed);
+        parser.NDFA.getFinish().setAcceptState(true);
         return parser.NDFA;
     }
 
@@ -79,7 +80,7 @@ public class ThompsonConstruction {
                 //And
                 case '.':
                     char next = pop();
-                    Expression nextExpr = (next == '(') ? parse() : new Expression.Symb(next);
+                    Expression nextExpr = (next == '(') ? parse() : createSym(next);
                     if (peek() == '*')
                     {
                         pop();
@@ -116,6 +117,7 @@ public class ThompsonConstruction {
             expr = new Expression.Star(expr);
         }
 
+        NDFA.addSymbol(sym);
         return expr;
     }
     //endregion

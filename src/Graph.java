@@ -1,12 +1,15 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Graph {
     private String name;
     private ArrayList<Node> nodes;
     private Node initial;
     private Node finish;
+    private Set<Character> alphabet;
 
     public Graph() {
         this("");
@@ -17,6 +20,7 @@ public class Graph {
         nodes = new ArrayList<>();
         initial = null;
         finish = null;
+        alphabet = new HashSet<>();
     }
 
     public void saveGraph()
@@ -35,14 +39,20 @@ public class Graph {
         file.println("digraph " + name + " {");
         file.println("rankdir=LR");
         file.println("node [shape = point, color=white, fontcolor=white]; start");
-        file.println("node [shape = doublecircle, color=black, fontcolor=black]; " + finish.getName() + ";");
+        file.println("node [shape = doublecircle, color=black, fontcolor=black];");
+        for (Node node : nodes)
+        {
+            if (node.isAcceptState())
+                file.println(node.getName());
+        }
         file.println("node [shape = circle];");
         file.println("start -> " + initial.getName());
         for (Node node : nodes)
         {
             for (Edge edge : node.getConnections())
             {
-                file.println(node.getName() + " -> " + edge.getEnd().getName() + " [label = " + edge.getWeight() + " ]");
+                String label = (edge.getWeight() == null) ? "\" \"" : edge.getWeight();
+                file.println(node.getName() + " -> " + edge.getEnd().getName() + " [label = " + label + " ]");
             }
         }
         file.println("}");
@@ -93,5 +103,13 @@ public class Graph {
 
     public void setNodes(ArrayList<Node> nodes) {
         this.nodes = nodes;
+    }
+
+    public Set<Character> getAlphabet() {
+        return alphabet;
+    }
+
+    public void addSymbol(char sym) {
+        alphabet.add(sym);
     }
 }

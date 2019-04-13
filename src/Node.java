@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class Node {
     private int name;
     private ArrayList<Edge> connections;
+    private boolean acceptState;
 
     public Node()
     {
@@ -12,6 +13,7 @@ public class Node {
     public Node(int name) {
         this.name = name;
         this.connections = new ArrayList<>();
+        this.acceptState = false;
     }
 
 
@@ -36,5 +38,13 @@ public class Node {
 
     public void setConnections(ArrayList<Edge> connections) {
         this.connections = connections;
+    }
+
+    public boolean isAcceptState() {
+        return acceptState;
+    }
+
+    public void setAcceptState(boolean acceptState) {
+        this.acceptState = acceptState;
     }
 }

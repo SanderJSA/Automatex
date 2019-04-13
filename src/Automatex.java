@@ -13,6 +13,15 @@ public class Automatex {
 
             Graph NDFA = ThompsonConstruction.regexToNDFA(regex);
             NDFA.saveGraph();
+
+            Graph DFA = NFAtoDFA.convertNFA(NDFA);
+            DFA.saveGraph();
+
+
+
+
+
+
             try
             {
                 Runtime.getRuntime().exec("dot " + NDFA.getName() + ".dot -Tpng -o " + NDFA.getName() + ".png");
