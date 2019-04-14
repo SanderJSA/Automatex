@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Scanner;
 
 public class Automatex {
@@ -7,28 +6,30 @@ public class Automatex {
     {
         Scanner input = new Scanner(System.in);
 
-        while (true) {
+        boolean stop = false;
+        while (!stop) {
+
             System.out.println("Please input your regular expression : ");
             String regex = input.nextLine();
 
-            Graph NDFA = ThompsonConstruction.regexToNDFA(regex);
-            NDFA.saveGraph();
+            Graph NFA = RegextoNFA.regexToNDFA(regex);
+            NFA.saveGraph();
 
-            Graph DFA = NFAtoDFA.convertNFA(NDFA);
+            Graph DFA = NFAtoDFA.convertToDFA(NFA);
             DFA.saveGraph();
 
+            System.out.println("Please enter your string");
+            String text = input.nextLine();
+            String result = EvaluateDFA.evaluate(DFA, text);
+            System.out.println(result);
 
-
-
-
-
-            try
+            System.out.println("Press 0 if you want to stop");
+            if (input.nextLine().equals("0"))
             {
-                Runtime.getRuntime().exec("dot " + NDFA.getName() + ".dot -Tpng -o " + NDFA.getName() + ".png");
-            }
-            catch (IOException e)
-            {
+                stop = true;
             }
         }
+
+        input.close();
     }
 }

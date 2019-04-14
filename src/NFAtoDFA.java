@@ -12,7 +12,7 @@ public class NFAtoDFA {
         DFA = new Graph("DFA");
     }
 
-    public static Graph convertNFA(Graph NFA)
+    public static Graph convertToDFA(Graph NFA)
     {
         NFAtoDFA converter = new NFAtoDFA(NFA);
 
@@ -67,6 +67,7 @@ public class NFAtoDFA {
                 {
                     continue;
                 }
+
                 if (!DStates.contains(newState))
                 {
                     DStates.add(newState);

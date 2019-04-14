@@ -1,12 +1,12 @@
 @SuppressWarnings("Duplicates")
 
-public class ThompsonConstruction {
+public class RegextoNFA {
     private int index;
     private String regex;
     private Graph NDFA;
 
 
-    public ThompsonConstruction(String regex)
+    public RegextoNFA(String regex)
     {
         index = 1;
         this.regex = preProcess(regex);
@@ -16,7 +16,7 @@ public class ThompsonConstruction {
 
     public static Graph regexToNDFA(String regex)
     {
-        ThompsonConstruction parser = new ThompsonConstruction(regex);
+        RegextoNFA parser = new RegextoNFA(regex);
         Expression parsed =  parser.parse();
         System.out.println(parsed);
         parser.expressionToNDFA(parsed);

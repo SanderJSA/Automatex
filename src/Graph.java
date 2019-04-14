@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ public class Graph {
 
     public void saveGraph()
     {
+        //Open or Create file
         PrintWriter file = null;
         try
         {
@@ -36,6 +38,7 @@ public class Graph {
             System.exit (0);
         }
 
+        //Write to file
         file.println("digraph " + name + " {");
         file.println("rankdir=LR");
         file.println("node [shape = point, color=white, fontcolor=white]; start");
@@ -58,6 +61,16 @@ public class Graph {
         file.println("}");
 
         file.close();
+
+        //Generate image from .dot file
+        try
+        {
+            Runtime.getRuntime().exec("dot " + name + ".dot -Tpng -o " + name + ".png");
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not generate picture from .dot file, is Graphviz installed ?");
+        }
     }
 
     public Node getNode(int index)
