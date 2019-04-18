@@ -35,12 +35,12 @@ public class RegextoNFA {
                 i++;
             }
         }
-        return "(" + input + ")";
+        return "(" + input + ") ";
     }
 
     private boolean leftValid(char left)
     {
-        return left == ')' || left == '*' || isAlphabet(left);
+        return left == ')' || isUnary(left) || isAlphabet(left);
     }
 
     private boolean rightValid(char right)
@@ -50,7 +50,13 @@ public class RegextoNFA {
 
     private boolean isAlphabet(char character)
     {
-        return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9');
+        //character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9'
+        return character != '(' && character != ')' && character != '|' && !isUnary(character);
+    }
+
+    private boolean isUnary(char character)
+    {
+        return character == '*' || character == '+' || character == '?';
     }
     //endregion
 
@@ -76,22 +82,12 @@ public class RegextoNFA {
                 //Or
                 case '|':
                     return new Expression.Or(expr, parse());
-                    //break;
                 //And
                 case '.':
                     char next = pop();
                     Expression nextExpr = (next == '(') ? parse() : createSym(next);
-                    if (peek() == '*')
-                    {
-                        pop();
-                        nextExpr = new Expression.Star(nextExpr);
-                    }
 
                     expr = new Expression.And(expr, nextExpr);
-                    break;
-                //Star
-                case '*':
-                    expr = new Expression.Star(expr);
                     break;
                 //(
                 case '(':
@@ -104,21 +100,32 @@ public class RegextoNFA {
             }
         }
         pop();
-        return expr;
+        return evalUnary(expr);
     }
 
     private Expression createSym(char sym)
     {
         Expression expr = new Expression.Symb(sym);
-
-        if (peek() == '*')
-        {
-            pop();
-            expr = new Expression.Star(expr);
-        }
-
         NDFA.addSymbol(sym);
-        return expr;
+        return evalUnary(expr);
+    }
+
+    private Expression evalUnary(Expression expr)
+    {
+        switch (peek())
+        {
+            case '*':
+                pop();
+                return new Expression.Star(expr);
+            case '+':
+                pop();
+                return new Expression.And(expr, new Expression.Star(expr));
+            case '?':
+                pop();
+                return new Expression.Or(expr, new Expression.Symb('ε'));
+            default:
+                return expr;
+        }
     }
     //endregion
 
@@ -143,7 +150,8 @@ public class RegextoNFA {
         Node finish = addNode();
 
         //Perform Thompson's construction
-        initial.addConnection(finish, String.valueOf(expr.getSymb()));
+        String symb = (expr.getSymb() == 'ε') ? null : String.valueOf(expr.getSymb());
+        initial.addConnection(finish, symb);
 
         //update states
         NDFA.setInitial(initial);

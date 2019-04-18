@@ -5,11 +5,11 @@ public class EvaluateDFA {
         for (int i = 0; i < text.length(); i++)
         {
             int end = selectionIsValid(DFA, text, i);
-            if (end != i)
+            if (end != -1)
             {
                 //[31m is red and [0m is reset
                 text = text.substring(0, i) + "\u001B[31m" + text.substring(i, end) + "\u001B[0m" + text.substring(end);
-                i += 9;
+                i = end + 9;
             }
         }
 
@@ -38,9 +38,9 @@ public class EvaluateDFA {
             }
             if (!changedState)
             {
-                return (node.isAcceptState()) ? i : start;
+                return (node.isAcceptState()) ? i : -1;
             }
         }
-        return (node.isAcceptState()) ? i : start;
+        return (node.isAcceptState()) ? i : -1;
     }
 }

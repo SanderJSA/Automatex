@@ -23,8 +23,8 @@ public class Automatex {
             String result = EvaluateDFA.evaluate(DFA, text);
             System.out.println(result);
 
-            System.out.println("Press 0 if you want to stop");
-            if (input.nextLine().equals("0"))
+            System.out.println("\u001B[0mContinue ? Y/n");
+            if (input.nextLine().toLowerCase().equals("n"))
             {
                 stop = true;
             }
