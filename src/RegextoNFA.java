@@ -17,7 +17,7 @@ public class RegextoNFA {
     public static Graph regexToNDFA(String regex)
     {
         RegextoNFA parser = new RegextoNFA(regex);
-        Expression parsed =  parser.parse();
+        Expression parsed =  parser.regex();
         System.out.println(parsed);
         parser.expressionToNDFA(parsed);
         parser.NDFA.getFinish().setAcceptState(true);
@@ -31,8 +31,8 @@ public class RegextoNFA {
         {
             if (leftValid(input.charAt(i-1)) && rightValid(input.charAt(i)))
             {
-                input = input.substring(0, i) + '.' + input.substring(i);
-                i++;
+                //input = input.substring(0, i) + '.' + input.substring(i);
+                //i++;
             }
         }
         return "(" + input + ") ";
@@ -71,6 +71,92 @@ public class RegextoNFA {
         return regex.charAt(index++);
     }
 
+    //Recursive descent
+    /*
+   <regex> ::= <term> '|' <regex>
+            |  <term>
+
+   <term> ::= { <factor> }
+
+   <factor> ::= <base> { '*' }
+
+   <base> ::= <char>
+           |  '\' <char>
+           |  '(' <regex> ')'
+     */
+
+    private Expression regex()
+    {
+        Expression term = term();
+        if (peek() == '|')
+        {
+            pop();
+            Expression regex = regex();
+            return new Expression.Or(term, regex);
+        }
+
+        return term;
+    }
+
+    private Expression term()
+    {
+        Expression factor = new Expression.Symb('ε');
+
+        while (peek() != ')' && peek() != '|')
+        {
+            Expression nextFactor = factor();
+            factor = new Expression.And(factor, nextFactor);
+        }
+
+        return factor;
+    }
+
+    private Expression factor()
+    {
+        Expression base = base();
+
+        while (isUnary(peek()))
+        {
+            switch (peek())
+            {
+                case '*':
+                    pop();
+                    base = new Expression.Star(base);
+                    break;
+                case '+':
+                    pop();
+                    base = new Expression.And(base, new Expression.Star(base));
+                    break;
+                case '?':
+                    pop();
+                    base = new Expression.Or(base, new Expression.Symb('ε'));
+                    break;
+                default:
+                    System.out.println("Invalid unary operator : " + peek());
+            }
+        }
+
+        return base;
+    }
+
+    private Expression base()
+    {
+        if (peek() == '(')
+        {
+            pop();
+            Expression regex = regex();
+            pop();
+            return regex;
+        }
+
+        NDFA.addSymbol(peek());
+        return new Expression.Symb(pop());
+    }
+
+
+
+
+    /*
     private Expression parse()
     {
         Expression expr = new Expression.Empty();
@@ -116,6 +202,7 @@ public class RegextoNFA {
         {
             case '*':
                 pop();
+                System.out.println("huh");
                 return new Expression.Star(expr);
             case '+':
                 pop();
@@ -127,6 +214,7 @@ public class RegextoNFA {
                 return expr;
         }
     }
+    */
     //endregion
 
     //region Expressions
