@@ -10,15 +10,22 @@ public class RegextoNFA {
     {
         index = 1;
         this.regex = preProcess(regex);
-        System.out.println(this.regex);
         NDFA = new Graph("NDFA");
     }
 
-    public static Graph regexToNDFA(String regex)
+    public static Graph regexToNDFA(String regex, boolean debug)
     {
+        //Instantiate and generate AST
         RegextoNFA parser = new RegextoNFA(regex);
         Expression parsed =  parser.regex();
-        System.out.println(parsed);
+
+        if (debug)
+        {
+            System.out.println("Preprocessed regex: " + parser.regex);
+            System.out.println("Generated AST: " + parsed);
+        }
+
+        //Generate NFA from AST
         parser.expressionToNDFA(parsed);
         parser.NDFA.getFinish().setAcceptState(true);
         return parser.NDFA;
@@ -27,30 +34,53 @@ public class RegextoNFA {
     //region preProcess
     private String preProcess(String input)
     {
-        for (int i = 1; i < input.length(); i++)
+        StringBuilder regexBuilder = new StringBuilder(input);
+        for (int i = 0; i < regexBuilder.length(); i++)
         {
-            if (leftValid(input.charAt(i-1)) && rightValid(input.charAt(i)))
+            if (regexBuilder.charAt(i) == '[')
             {
-                //input = input.substring(0, i) + '.' + input.substring(i);
-                //i++;
+                regexBuilder.setCharAt(i,'(');
+                i += 2;
+                while (i < regexBuilder.length() && regexBuilder.charAt(i) != ']')
+                {
+                    if (regexBuilder.charAt(i) != '-')
+                    {
+                        regexBuilder.insert(i++, '|');
+                    }
+                    else
+                    {
+                        regexBuilder.deleteCharAt(i);
+                        char start = regexBuilder.charAt(i-1);
+                        start++;
+                        char end = regexBuilder.charAt(i);
+
+                        while (start < end)
+                        {
+                            regexBuilder.insert(i++, '|');
+                            regexBuilder.insert(i++, start);
+                            start++;
+                        }
+                        regexBuilder.insert(i++, '|');
+                    }
+                    i++;
+                }
+                if (i != regexBuilder.length())
+                {
+                    regexBuilder.setCharAt(i, ')');
+                }
+                else
+                {
+                    System.out.println("Invalid regex, unmatched [");
+                    return "()";
+                }
+
             }
         }
-        return "(" + input + ") ";
-    }
-
-    private boolean leftValid(char left)
-    {
-        return left == ')' || isUnary(left) || isAlphabet(left);
-    }
-
-    private boolean rightValid(char right)
-    {
-        return right == '(' || isAlphabet(right);
+        return "(" + regexBuilder + ")";
     }
 
     private boolean isAlphabet(char character)
     {
-        //character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9'
         return character != '(' && character != ')' && character != '|' && !isUnary(character);
     }
 
@@ -60,7 +90,7 @@ public class RegextoNFA {
     }
     //endregion
 
-    //region Parser
+    //region Recursive descent
     private char peek()
     {
         return regex.charAt(index);
@@ -71,19 +101,19 @@ public class RegextoNFA {
         return regex.charAt(index++);
     }
 
-    //Recursive descent
     /*
-   <regex> ::= <term> '|' <regex>
-            |  <term>
+    The algorithm is based on the following EBNF grammar
 
-   <term> ::= { <factor> }
+   <regex>  ::= <term> '|' <regex>
+            |   <term>
 
-   <factor> ::= <base> { '*' }
+   <term>   ::= { <factor> }
 
-   <base> ::= <char>
-           |  '\' <char>
-           |  '(' <regex> ')'
-     */
+   <factor> ::= <base> { '*' }{ '+' }{ '?' }
+
+   <base>   ::= <char>
+            |   '(' <regex> ')'
+    */
 
     private Expression regex()
     {
@@ -153,68 +183,6 @@ public class RegextoNFA {
         return new Expression.Symb(pop());
     }
 
-
-
-
-    /*
-    private Expression parse()
-    {
-        Expression expr = new Expression.Empty();
-        while(peek() != ')')
-        {
-            char sym = pop();
-            switch (sym)
-            {
-                //Or
-                case '|':
-                    return new Expression.Or(expr, parse());
-                //And
-                case '.':
-                    char next = pop();
-                    Expression nextExpr = (next == '(') ? parse() : createSym(next);
-
-                    expr = new Expression.And(expr, nextExpr);
-                    break;
-                //(
-                case '(':
-                    expr = parse();
-                    break;
-                //Sym
-                default:
-                    expr = createSym(sym);
-                    break;
-            }
-        }
-        pop();
-        return evalUnary(expr);
-    }
-
-    private Expression createSym(char sym)
-    {
-        Expression expr = new Expression.Symb(sym);
-        NDFA.addSymbol(sym);
-        return evalUnary(expr);
-    }
-
-    private Expression evalUnary(Expression expr)
-    {
-        switch (peek())
-        {
-            case '*':
-                pop();
-                System.out.println("huh");
-                return new Expression.Star(expr);
-            case '+':
-                pop();
-                return new Expression.And(expr, new Expression.Star(expr));
-            case '?':
-                pop();
-                return new Expression.Or(expr, new Expression.Symb('ε'));
-            default:
-                return expr;
-        }
-    }
-    */
     //endregion
 
     //region Expressions

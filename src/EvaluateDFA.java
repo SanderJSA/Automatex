@@ -5,25 +5,26 @@ public class EvaluateDFA {
         for (int i = 0; i < text.length(); i++)
         {
             int end = selectionIsValid(DFA, text, i);
-            if (end != -1)
+            if (end != i)
             {
                 //[31m is red and [0m is reset
                 text = text.substring(0, i) + "\u001B[31m" + text.substring(i, end) + "\u001B[0m" + text.substring(end);
-                i = end + 9;
+                i = end + 8;
             }
         }
 
         return text;
     }
 
-    private static int selectionIsValid(Graph DFA, String text, int start)
+    private static int selectionIsValid(Graph DFA, String text, int i)
     {
-        int i = start;
+        int lastValid = i;
+        boolean changedState = true;
 
         Node node = DFA.getInitial();
-        while ( i < text.length())
+        while (changedState && i < text.length())
         {
-            boolean changedState = false;
+            changedState = false;
             for (Edge edge : node.getConnections())
             {
                 if (text.charAt(i) == edge.getWeight().charAt(0))
@@ -33,14 +34,14 @@ public class EvaluateDFA {
                     i++;
                     break;
                 }
-
-
             }
-            if (!changedState)
+
+            if (node.isAcceptState())
             {
-                return (node.isAcceptState()) ? i : -1;
+                lastValid = i;
             }
         }
-        return (node.isAcceptState()) ? i : -1;
+
+        return lastValid;
     }
 }
