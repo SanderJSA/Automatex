@@ -54,8 +54,8 @@ public class Graph {
         {
             for (Edge edge : node.getConnections())
             {
-                String label = (edge.getWeight() == null) ? "\" \"" : edge.getWeight();
-                file.println(node.getName() + " -> " + edge.getEnd().getName() + " [label = " + label + " ]");
+                String label = (edge.getWeight() == null) ? "" : edge.getWeight();
+                file.println(node.getName() + " -> " + edge.getEnd().getName() + " [label = \"" + label + "\" ]");
             }
         }
         file.println("}");

@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Automatex {
@@ -17,6 +20,20 @@ public class Automatex {
         return DFA;
     }
 
+    private static String readFile(String filename)
+    {
+        String content = "";
+        try
+        {
+
+            content = new String ( Files.readAllBytes(Paths.get(filename)));
+        }
+        catch (IOException e)
+        {
+            System.out.println("Could not open file " + filename);
+        }
+        return content;
+    }
 
     public static void main(String[] args)
     {
@@ -51,24 +68,28 @@ public class Automatex {
             switch (input.nextLine().charAt(0))
             {
                 case '0':
-                    System.out.println("Please input your Regex:");
+                    System.out.println("\n\nPlease input your Regex:");
                     regex = input.nextLine();
                     DFA = generateDFA(regex, debug);
                     break;
 
                 case '1':
-                    System.out.println("Please input the string you wish to evaluate:");
+                    System.out.println("\n\nPlease input the string you wish to evaluate:");
                     String text = input.nextLine();
                     String result = EvaluateDFA.evaluate(DFA, text);
                     System.out.println(result);
                     break;
 
                 case '2':
+                    System.out.println("\n\nPlease input your filename:");
+                     text = readFile(input.nextLine());
+                     result = EvaluateDFA.evaluate(DFA, text);
+                    System.out.println(result);
                     break;
 
                 case '3':
                     debug = !debug;
-                    System.out.println("Debug mode is now " + debug);
+                    System.out.println("\n\nDebug mode is now " + debug);
                     break;
 
                 case '4':
@@ -76,7 +97,7 @@ public class Automatex {
                     break;
 
                 default:
-                    System.out.println("Invalid input, please enter an integer from 0 to 4.");
+                    System.out.println("\n\nInvalid input, please enter an integer from 0 to 4.");
             }
         }
 

@@ -112,6 +112,7 @@ public class RegextoNFA {
    <factor> ::= <base> { '*' }{ '+' }{ '?' }
 
    <base>   ::= <char>
+            |   '\' <char>
             |   '(' <regex> ')'
     */
 
@@ -130,11 +131,17 @@ public class RegextoNFA {
 
     private Expression term()
     {
-        Expression factor = new Expression.Symb('ε');
+        //if statement to remove redundant empty expression
+        Expression factor = new Expression.Symb(null);
+        if (peek() != ')' && peek() != '|')
+        {
+            factor = factor();
+        }
 
         while (peek() != ')' && peek() != '|')
         {
             Expression nextFactor = factor();
+
             factor = new Expression.And(factor, nextFactor);
         }
 
@@ -159,7 +166,7 @@ public class RegextoNFA {
                     break;
                 case '?':
                     pop();
-                    base = new Expression.Or(base, new Expression.Symb('ε'));
+                    base = new Expression.Or(base, new Expression.Symb(null));
                     break;
                 default:
                     System.out.println("Invalid unary operator : " + peek());
@@ -179,8 +186,16 @@ public class RegextoNFA {
             return regex;
         }
 
-        NDFA.addSymbol(peek());
-        return new Expression.Symb(pop());
+        char symb = pop();
+
+        //Check escaped characters
+        if (symb == '\\')
+        {
+            symb = (peek() == 'n') ? '\n' : peek();
+            pop();
+        }
+        NDFA.addSymbol(symb);
+        return new Expression.Symb(String.valueOf(symb));
     }
 
     //endregion
@@ -206,8 +221,7 @@ public class RegextoNFA {
         Node finish = addNode();
 
         //Perform Thompson's construction
-        String symb = (expr.getSymb() == 'ε') ? null : String.valueOf(expr.getSymb());
-        initial.addConnection(finish, symb);
+        initial.addConnection(finish, expr.getSymb());
 
         //update states
         NDFA.setInitial(initial);
