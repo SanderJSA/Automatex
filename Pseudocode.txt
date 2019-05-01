@@ -1,0 +1,40 @@
+regex to AST
+
+Based on the following ENBF grammar:
+
+<regex>  ::= <term> '|' <regex>
+           |   <term>
+
+<term>   ::= { <factor> }
+
+<factor> ::= <base> { '*' }{ '+' }{ '?' }
+
+<base>   ::= <char>
+           |   '\' <char>
+           |   '(' <regex> ')'
+
+
+implement recursive descent.
+
+
+AST to NFA
+
+Based on the AST, call recursively the thompson construct and create graphs based on these diagrams:
+https://en.wikipedia.org/wiki/Thompson%27s_construction
+
+NFA to DFA
+
+perform Powerset construction on NFA.
+group every epsilon transitions, go to next char, repeat
+
+Evaluate DFA
+
+start on start node
+while char left in word
+	go to next node
+	if no next node:
+		return last accepting state
+
+	if accepting state:
+		last accepting state = node
+	
