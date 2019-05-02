@@ -195,7 +195,7 @@ public class RegextoNFA {
             pop();
         }
         NDFA.addSymbol(symb);
-        return new Expression.Symb(String.valueOf(symb));
+        return new Expression.Symb(symb);
     }
 
     //endregion
@@ -221,7 +221,11 @@ public class RegextoNFA {
         Node finish = addNode();
 
         //Perform Thompson's construction
-        initial.addConnection(finish, expr.getSymb());
+        if (expr.getSymb() == null)
+            initial.addEpsilon(finish);
+        else
+            initial.addTransition(expr.getSymb(), finish);
+
 
         //update states
         NDFA.setInitial(initial);
@@ -239,7 +243,7 @@ public class RegextoNFA {
         Node bF = NDFA.getFinish();
 
         //Perform Thompson's construction
-        aF.addConnection(bI, null);
+        aF.addEpsilon(bI);
 
         //update states
         NDFA.setInitial(aI);
@@ -259,10 +263,10 @@ public class RegextoNFA {
         Node finish = addNode();
 
         //Perform Thompson's construction
-        initial.addConnection(aI, null);
-        initial.addConnection(bI, null);
-        aF.addConnection(finish, null);
-        bF.addConnection(finish, null);
+        initial.addEpsilon(aI);
+        initial.addEpsilon(bI);
+        aF.addEpsilon(finish);
+        bF.addEpsilon(finish);
 
         //update states
         NDFA.setInitial(initial);
@@ -279,10 +283,10 @@ public class RegextoNFA {
         Node finish = addNode();
 
         //Perform Thompson's construction
-        initial.addConnection(finish, null);
-        initial.addConnection(aI, null);
-        aF.addConnection(aI, null);
-        aF.addConnection(finish, null);
+        initial.addEpsilon(finish);
+        initial.addEpsilon(aI);
+        aF.addEpsilon(aI);
+        aF.addEpsilon(finish);
 
         NDFA.setInitial(initial);
         NDFA.setFinish(finish);

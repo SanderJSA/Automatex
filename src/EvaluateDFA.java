@@ -16,32 +16,26 @@ public class EvaluateDFA {
         return text;
     }
 
-    private static int selectionIsValid(Graph DFA, String text, int i)
-    {
+    private static int selectionIsValid(Graph DFA, String text, int i) {
         int lastValid = i;
-        boolean changedState = true;
-
         Node node = DFA.getInitial();
-        while (changedState && i < text.length())
-        {
-            changedState = false;
-            for (Edge edge : node.getConnections())
+
+        while (i < text.length()) {
+            //Move to next node and character
+            node = node.getNode(text.charAt(i));
+            i++;
+
+            if (node == null)
             {
-                if (text.charAt(i) == edge.getWeight().charAt(0))
-                {
-                    changedState = true;
-                    node = edge.getEnd();
-                    i++;
-                    break;
-                }
+                return lastValid;
             }
 
             if (node.isAcceptState())
             {
                 lastValid = i;
             }
-        }
 
+        }
         return lastValid;
     }
 }

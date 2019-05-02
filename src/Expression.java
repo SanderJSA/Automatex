@@ -72,9 +72,9 @@ public abstract class Expression
 
     public static class Symb extends Expression
     {
-        private String symb;
+        private Character symb;
 
-        public Symb(String symb)
+        public Symb(Character symb)
         {
             this.symb = symb;
         }
@@ -84,7 +84,7 @@ public abstract class Expression
             return "'"+ symb + "'";
         }
 
-        public String getSymb() {
+        public Character getSymb() {
             return symb;
         }
     }

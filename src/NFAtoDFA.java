@@ -60,7 +60,14 @@ public class NFAtoDFA {
                 DFA.getNode(index).setAcceptState(true);
 
             marked.set(index, true);
-            for (char sym : NFA.getAlphabet())
+            //get every symbol transitions to an alphabet
+            Set<Character> alphabet = new HashSet<>();
+            for (Node node : state)
+            {
+                alphabet.addAll(node.getTransitions().keySet());
+            }
+
+            for (char sym : alphabet)
             {
                 ArrayList<Node> newState = epsilonClosure(move(state, sym));
                 if (newState.size()==0)
@@ -72,40 +79,16 @@ public class NFAtoDFA {
                 {
                     DStates.add(newState);
                     marked.add(false);
-                    DFA.getNode(index).addConnection(addNode(), String.valueOf(sym));
+                    DFA.getNode(index).addTransition(sym, addNode());
                 }
                 else
                 {
-                    DFA.getNode(index).addConnection(DFA.getNode(DStates.indexOf(newState)), String.valueOf(sym));
+                    DFA.getNode(index).addTransition(sym, DFA.getNode(DStates.indexOf(newState)));
                 }
             }
         }
     }
 
-    private Node nextNode(ArrayList<Node> T)
-    {
-        Node node = addNode();
-        if (setContainsFinish(T))
-            node.setAcceptState(true);
-
-        for(char sym : NFA.getAlphabet())
-        {
-            ArrayList<Node> S = move(T, sym);
-            S = epsilonClosure(S);
-            if (!S.isEmpty())
-            {
-                if (S.equals(T))
-                {
-                    node.addConnection(node, String.valueOf(sym));
-                }
-                else
-                {
-                    node.addConnection(nextNode(S), String.valueOf(sym));
-                }
-            }
-        }
-        return node;
-    }
 
     private boolean setContainsFinish(ArrayList<Node> T)
     {
@@ -121,14 +104,7 @@ public class NFAtoDFA {
     {
         for (int i = 0; i < T.size(); i++)
         {
-            for (Edge edge : T.get(i).getConnections())
-            {
-                if (edge.getWeight() == null)
-                {
-                    if (!T.contains(edge.getEnd()))
-                        T.add(edge.getEnd());
-                }
-            }
+            T.addAll(T.get(i).getEpsilonTransitions());
         }
         return T;
     }
@@ -139,13 +115,10 @@ public class NFAtoDFA {
 
         for (Node node : T)
         {
-            for (Edge edge : node.getConnections())
+            Node nextNode = node.getNode(sym);
+            if (nextNode != null && !result.contains(nextNode))
             {
-                if (edge.getWeight() != null && edge.getWeight().charAt(0) == sym)
-                {
-                    if (!result.contains(edge.getEnd()))
-                        result.add(edge.getEnd());
-                }
+                result.add(nextNode);
             }
         }
         return result;

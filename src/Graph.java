@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Graph {
@@ -11,10 +12,6 @@ public class Graph {
     private Node initial;
     private Node finish;
     private Set<Character> alphabet;
-
-    public Graph() {
-        this("");
-    }
 
     public Graph(String name) {
         this.name = name;
@@ -52,10 +49,14 @@ public class Graph {
         file.println("start -> " + initial.getName());
         for (Node node : nodes)
         {
-            for (Edge edge : node.getConnections())
+            for (Map.Entry<Character, Node> entry : node.getTransitions().entrySet())
             {
-                String label = (edge.getWeight() == null) ? "" : edge.getWeight();
-                file.println(node.getName() + " -> " + edge.getEnd().getName() + " [label = \"" + label + "\" ]");
+                file.println(node.getName() + " -> " + entry.getValue().getName() + " [label = \"" + entry.getKey() + "\" ]");
+            }
+
+            for (Node finish : node.getEpsilonTransitions())
+            {
+                file.println(node.getName() + " -> " + finish.getName() + " [label = \" \" ]");
             }
         }
         file.println("}");
