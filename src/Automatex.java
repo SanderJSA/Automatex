@@ -25,7 +25,6 @@ public class Automatex {
         String content = "";
         try
         {
-
             content = new String ( Files.readAllBytes(Paths.get(filename)));
         }
         catch (IOException e)

@@ -22,12 +22,18 @@ public class EvaluateDFA {
 
         while (i < text.length()) {
             //Move to next node and character
+            Node prev = node;
             node = node.getNode(text.charAt(i));
             i++;
 
             if (node == null)
             {
-                return lastValid;
+                //Check if wildcard is there
+                node = prev.getNode('\u200B');
+                if (node == null)
+                {
+                    return lastValid;
+                }
             }
 
             if (node.isAcceptState())

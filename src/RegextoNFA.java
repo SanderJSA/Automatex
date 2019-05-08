@@ -49,7 +49,10 @@ public class RegextoNFA {
                     }
                     else
                     {
+                        //remove '-'
                         regexBuilder.deleteCharAt(i);
+
+                        //Insert every characters separated by '|' between start and finish
                         char start = regexBuilder.charAt(i-1);
                         start++;
                         char end = regexBuilder.charAt(i);
@@ -64,6 +67,8 @@ public class RegextoNFA {
                     }
                     i++;
                 }
+
+                //Check for invalid regex
                 if (i != regexBuilder.length())
                 {
                     regexBuilder.setCharAt(i, ')');
@@ -194,6 +199,13 @@ public class RegextoNFA {
             symb = (peek() == 'n') ? '\n' : peek();
             pop();
         }
+
+        //Check for wildcard
+        if (symb == '.')
+        {
+            symb = '\u200B';
+        }
+
         NDFA.addSymbol(symb);
         return new Expression.Symb(symb);
     }
@@ -225,7 +237,6 @@ public class RegextoNFA {
             initial.addEpsilon(finish);
         else
             initial.addTransition(expr.getSymb(), finish);
-
 
         //update states
         NDFA.setInitial(initial);

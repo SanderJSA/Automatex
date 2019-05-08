@@ -70,10 +70,6 @@ public class NFAtoDFA {
             for (char sym : alphabet)
             {
                 ArrayList<Node> newState = epsilonClosure(move(state, sym));
-                if (newState.size()==0)
-                {
-                    continue;
-                }
 
                 if (!DStates.contains(newState))
                 {
